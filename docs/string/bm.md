@@ -212,7 +212,7 @@ $$
 1. $k < j$。因为当 $k=j$ 时，有 $pat[k]=pat[j]$，在 $pat[j]$ 上失配的字符也会在 $pat[k]$ 上失配。
 2. 考虑到 $delta_2(patlastpos)= 0$，所以规定 $rpr(patlastpos) = patlastpos$。
 
-由于理解 $rpr(j)$ 是实现 BoyerMoore 算法的核心，所以我们使用如下两个例子进行详细说明：
+由于理解 $rpr(j)$ 是实现 Boyer–Moore 算法的核心，所以我们使用如下两个例子进行详细说明：
 
 $$
 \begin{aligned}
@@ -714,11 +714,11 @@ impl<'a> BMPattern<'a> {
 
 基于这两条原则思考，我就发现二进制字节本身：1 字节等宽、字符全集大小是 256，就是符合条件的完美字符！在这个基础上完成了一系列后缀匹配算法的高效实现。
 
-### Simplified Boyer-Moore 算法
+### Simplified Boyer–Moore 算法
 
 BM 算法最复杂的地方就在于 $delta_2$ 表（通俗的名字是好后缀表）的构建，而实践中发现，在一般的字符集上的匹配性能主要依靠 $delta_1$ 表（通俗的名字是坏字符表），于是出现了仅仅使用 $delta_1$ 表的简化版 BM 算法，通常表现和完整版差距很小。
 
-### Boyer-Moore-Horspol 算法
+### Boyer–Moore–Horspol 算法
 
 Horspol 算法同样是基于坏字符的规则，不过是在与 $pat$ 尾部对齐的字符上应用 $delta_1$，这个效果类似于前文对匹配算法的改进，所以它的通常表现优于原始 BM 和匹配算法改进后的 BM 差不多。
 
@@ -750,7 +750,7 @@ impl<'a> HorspoolPattern<'a> {
 }
 ```
 
-### Boyer-Moore-Sunday 算法
+### Boyer–Moore–Sunday 算法
 
 Sunday 算法同样是利用坏字符规则，只不过相比 Horspool 它更进一步，直接关注 $pat$ 尾部对齐的那个字符的下一个字符。
 
@@ -1053,9 +1053,9 @@ $$
 prob(m) = \frac{p^m(1-p)}{1-p^{patlen}}
 $$
 
-$skip(m,k)$ 为发生失配时 $pat$ 向下滑动 $k$ 个字符的概率，（这里的 $k$ 如同前文讨论的 $k$ 一样，为 $pat$ 实际滑动距离，不包括指针从失配位置回退到 $patlastpos$ 位置的距离）。实际上所有字符串匹配算法的核就在于 $skip(m,k)$，下面我们会通过分析 $delta_1$ 和 $delta_2$ 来计算 BoyerMoore 算法的 $skip(m,k)$。
+$skip(m,k)$ 为发生失配时 $pat$ 向下滑动 $k$ 个字符的概率，（这里的 $k$ 如同前文讨论的 $k$ 一样，为 $pat$ 实际滑动距离，不包括指针从失配位置回退到 $patlastpos$ 位置的距离）。实际上所有字符串匹配算法的核就在于 $skip(m,k)$，下面我们会通过分析 $delta_1$ 和 $delta_2$ 来计算 Boyer–Moore 算法的 $skip(m,k)$。
 
-### 计算 BoyerMoore 算法的 $skip(m,k)$
+### 计算 Boyer–Moore 算法的 $skip(m,k)$
 
 #### $delta_1$
 
@@ -1125,7 +1125,7 @@ probpr(m,k)(1-\sum_{n=2}^{k-1}probdelta2'(m, n)) & \text{for} & 1 \leqslant k \l
 \end{array}\right.
 $$
 
-于是通过组合 $delta_1$ 和 $delta_2$ 起作用的情况，我们就得到了 BoyerMoore 算法的 $skip$ 概率函数：
+于是通过组合 $delta_1$ 和 $delta_2$ 起作用的情况，我们就得到了 Boyer–Moore 算法的 $skip$ 概率函数：
 
 $$
 skip(m,k) = \left\{\begin{array}{lcl}
@@ -1338,7 +1338,7 @@ def plot(p, title, N=30):
 
 观察这个图像，令人印象深刻的首先就是抬头的一条大兰线，几乎笔直地画出了算法性能的下限，不愧是 KMP 算法，$O(n)$ 的时间复杂度，一看就很真实（ﾟ▽ﾟ)/。
 
-接着会发现 BoyerMoore 算法与简化版 BoyerMoore 算法高度重叠的这条红绿紫曲线，同时也是 $\dfrac{1}{patlen}$，
+接着会发现 Boyer–Moore 算法与简化版 Boyer–Moore 算法高度重叠的这条红绿紫曲线，同时也是 $\dfrac{1}{patlen}$，
 
 这就是在一般字符集下随机文本搜索能达到的 $O(\dfrac{n}{m})$ 的强力算法吗？(ﾟ△ﾟ;ﾉ)ﾉ
 
@@ -1350,11 +1350,11 @@ def plot(p, title, N=30):
 
 曲线出现了明显的分化，当然 KMP 还是一如既往地稳定（ﾟ▽ﾟ)/，如果此时在测试中监控一下一下 $delta_1$ 表和 $delta_2$ 表作用情况会发现：$delta_2$ 起作用的次数超过了 $delta_1$，而且 $delta_2$ 贡献的跳过字符数更是远超 $delta_1$，思考下，这件事其实也很好理解。
 
-总结一下，通过概率模型的计算，一方面看到了在较大的字符集，比如日常搜索的过程中 BoyerMoore 系列算法的优越表现，其中主要依赖 $delta_1$ 表实现字符跳转；另一方面，在较小的字符集里，$delta_1$ 的作用下降，而 $delta_2$ 的作用得到了体现。如果有一定富裕空间的情况下，使用完整的空间复杂度为 $O(m)$ 的 BoyerMoore 算法应该是一种适用各种情况、综合表现都很优异的算法选择。
+总结一下，通过概率模型的计算，一方面看到了在较大的字符集，比如日常搜索的过程中 BoyerMoore 系列算法的优越表现，其中主要依赖 $delta_1$ 表实现字符跳转；另一方面，在较小的字符集里，$delta_1$ 的作用下降，而 $delta_2$ 的作用得到了体现。如果有一定富裕空间的情况下，使用完整的空间–复杂度为 $O(m)$ 的 Boyer–Moore 算法应该是一种适用各种情况、综合表现都很优异的算法选择。
 
 ## 引用
 
-[^bm]: [1977 年 Boyer-Moore 算法论文](https://dl.acm.org/doi/10.1145/359842.359859)
+[^bm]: [1977 年 Boyer–Moore 算法论文](https://dl.acm.org/doi/10.1145/359842.359859)
 
 [^kmp]: [1977 年 KMP 算法论文](https://epubs.siam.org/doi/abs/10.1137/0206024)
 
